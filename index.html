@@ -4,15 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Study Planner</title>
-<link rel="manifest" href="manifest.webmanifest">
+<meta name="description" content="مخطط دراسة مع مؤقت بومودورو، جدول يومي، ملاحظات ومواعيد السنة · Study planner with Pomodoro timer, daily schedule, notes and yearly calendar">
 <meta name="theme-color" content="#d6402f">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Study Planner">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Study">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f3efe6;--card:#fffdf8;--ink:#1f2a37;--mute:#6b7280;--line:#e2dccd;--tom:#d6402f;--brk:#2f8f6b;--lng:#3a6fb0;--amb:#c98a12;--grid:rgba(58,111,176,.08);
@@ -132,6 +131,8 @@ h2{font-size:1.1rem;margin:0 0 12px}
 .hin{flex:1;border-style:dashed;background:transparent;padding:6px 10px}
 .hin:focus{border-style:solid;background:var(--bg)}
 .hp{border:1px solid var(--line);background:transparent;color:var(--mute);border-radius:10px;width:34px;cursor:pointer;font-size:1.1rem}
+.foot{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.theme[hidden]{display:none}
 .theme{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 12px;cursor:pointer;color:var(--ink);font:inherit}
 </style>
 </head>
@@ -224,13 +225,14 @@ h2{font-size:1.1rem;margin:0 0 12px}
 </section>
 </div>
 
-<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px">
+<div class="foot">
   <button class="theme" id="theme" data-i="theme"></button>
   <button class="theme" id="exp" data-i="exp"></button>
   <button class="theme" id="imp" data-i="imp"></button>
   <button class="theme" id="inst" data-i="inst" hidden></button>
-  <input type="file" id="impf" accept=".json,application/json" hidden>
+  <input type="file" id="impf" accept="application/json,.json" hidden>
 </div>
+<p class="sub" id="ios" style="text-align:center" data-i="iosHint" hidden></p>
 </main>
 <script>
 const D={
@@ -247,7 +249,7 @@ b0:'أول جلسة',b1:'10 جلسات',b2:'50 جلسة',b3:'100 جلسة',b4:'3
 yHint:'اضغط على أي يوم لتضيف إليه امتحاناً أو واجباً أو موعداً. النقاط الملونة تحت الرقم هي مواعيدك، وغمق الخلفية يعني جلسات أكثر.',
 sess:'{n} جلسة',sessMin:'{n} جلسة · {m} دقيقة',evPh:'ماذا عندك في هذا اليوم؟',exam:'امتحان',hw:'واجب',rev:'مراجعة',me:'شخصي',
 noEv:'لا شيء مسجل في هذا اليوم.',coming:'القادم',noUp:'لا توجد مواعيد قادمة. اضغط على يوم وأضف أول موعد.',
-today:'اليوم',tmr:'غداً',inD:'بعد {n} يوم',theme:'الوضع الليلي / النهاري',prev:'السنة السابقة',next:'السنة التالية',hPh:'اكتب ما تريد أن تفعله...',dayDone:'أنجزت {d} من {n}',now:'الآن',goNow:'الذهاب إلى الآن',prevD:'اليوم السابق',nextD:'اليوم التالي',exp:'تصدير نسخة احتياطية',imp:'استيراد نسخة',inst:'تثبيت التطبيق',impAsk:'سيتم استبدال بياناتك الحالية بالنسخة المستوردة. متابعة؟',impErr:'الملف غير صالح.'},
+today:'اليوم',tmr:'غداً',inD:'بعد {n} يوم',theme:'الوضع الليلي / النهاري',prev:'السنة السابقة',next:'السنة التالية',hPh:'اكتب ما تريد أن تفعله...',dayDone:'أنجزت {d} من {n}',now:'الآن',goNow:'الذهاب إلى الآن',prevD:'اليوم السابق',nextD:'اليوم التالي',exp:'تصدير نسخة احتياطية',imp:'استيراد نسخة',inst:'تثبيت التطبيق',iosHint:'لتثبيت التطبيق على آيفون: اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».',impAsk:'سيستبدل هذا بياناتك الحالية. هل تريد المتابعة؟',impOk:'تم استيراد البيانات.',impBad:'الملف غير صالح.'},
 en:{app:'Study Planner',s1:'Sessions today',s2:'Focus min',tPlan:'Planner',tDay:"Today's schedule",tNotes:'My notes',tAch:'Achievements',tYear:'Year',
 work:'Focus',short:'Short break',long:'Long break',go:'Start',pause:'Pause',reset:'Reset',skip:'Skip',
 hint:'{w} min focus, then a {s} min break. After 4 sessions take a long break ({l} min).',durT:'Session lengths (minutes)',pickDay:'Pick a day',pick:'Pick a task from the list',breath:'Breathe and drink some water',
@@ -261,7 +263,7 @@ b0:'First session',b1:'10 sessions',b2:'50 sessions',b3:'100 sessions',b4:'3-day
 yHint:'Tap any day to add an exam, assignment or event. Colored dots under the number are your events; a darker background means more focus sessions.',
 sess:'{n} sessions',sessMin:'{n} sessions · {m} min',evPh:'What do you have on this day?',exam:'Exam',hw:'Assignment',rev:'Revision',me:'Personal',
 noEv:'Nothing planned for this day.',coming:'Coming up',noUp:'No upcoming events. Tap a day and add your first one.',
-today:'Today',tmr:'Tomorrow',inD:'In {n} days',theme:'Dark / Light',prev:'Previous year',next:'Next year',hPh:'Write what you plan to do...',dayDone:'{d} of {n} done',now:'Now',goNow:'Jump to now',prevD:'Previous day',nextD:'Next day',exp:'Export backup',imp:'Import backup',inst:'Install app',impAsk:'This will replace your current data with the imported backup. Continue?',impErr:'Invalid file.'}};
+today:'Today',tmr:'Tomorrow',inD:'In {n} days',theme:'Dark / Light',prev:'Previous year',next:'Next year',hPh:'Write what you plan to do...',dayDone:'{d} of {n} done',now:'Now',goNow:'Jump to now',prevD:'Previous day',nextD:'Next day',exp:'Export backup',imp:'Import backup',inst:'Install app',iosHint:'To install on iPhone: tap the Share button, then “Add to Home Screen”.',impAsk:'This will replace your current data. Continue?',impOk:'Data imported.',impBad:'Invalid file.'}};
 
 const DUR={work:25,short:5,long:15},PRE=[[25,5,15],[50,10,20],[90,15,30]],COL={work:'--tom',short:'--brk',long:'--lng'};
 const CATS=['exam','hw','rev','me'];
@@ -480,18 +482,30 @@ function applyLang(){
 }
 $('lang').onclick=()=>{L=L==='ar'?'en':'ar';S.lang=L;save();applyLang()};
 $('theme').onclick=()=>{const r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dark?'light':'dark'};
-// ----- backup / install / offline -----
-$('exp').onclick=()=>{const b=new Blob([JSON.stringify(S)],{type:'application/json'}),a=document.createElement('a');
-  a.href=URL.createObjectURL(b);a.download='study-planner-backup-'+today()+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+$('exp').onclick=()=>{
+  const a=mk('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));
+  a.download='study-planner-backup-'+today()+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 $('imp').onclick=()=>$('impf').click();
-$('impf').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
-  r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||!Array.isArray(d.tasks)||typeof d.log!=='object')throw 0;
-    if(!confirm(t('impAsk')))return;localStorage.setItem('sp1',JSON.stringify(d));location.reload()}catch(x){alert(t('impErr'))}};
-  r.readAsText(f);e.target.value=''};
-let ip=null;
-addEventListener('beforeinstallprompt',e=>{e.preventDefault();ip=e;$('inst').hidden=false});
-$('inst').onclick=async()=>{if(!ip)return;ip.prompt();await ip.userChoice;ip=null;$('inst').hidden=true};
-if('serviceWorker' in navigator&&location.protocol.startsWith('http'))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+$('impf').onchange=e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);if(!d||typeof d!=='object'||!Array.isArray(d.tasks))throw 0;
+      if(!confirm(t('impAsk')))return;
+      S=Object.assign({tasks:[],sel:null,log:{},count:0,notes:[],sched:{},events:{},lang:''},d);
+      Object.assign(DUR,S.dur||{});L=S.lang||L;save();setMode(mode);applyLang();alert(t('impOk'));
+    }catch(x){alert(t('impBad'))}
+  };
+  r.readAsText(f);
+};
+// install as app
+let dip=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();dip=e;$('inst').hidden=false});
+$('inst').onclick=async()=>{if(!dip)return;dip.prompt();await dip.userChoice;dip=null;$('inst').hidden=true};
+addEventListener('appinstalled',()=>{$('inst').hidden=true});
+if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!navigator.standalone)$('ios').hidden=false;
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 applyLang();
 </script>
 </body>
